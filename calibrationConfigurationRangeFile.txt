@@ -1,0 +1,17 @@
+AB:CD:EF:12:34:56
+
+# rpm_range_1
+range_min = 0
+range_max = 901
+m = 180
+c = 0
+no_of_holes = 8
+
+
+
+
+12:34:56:78:9A:BC
+Device Name: AnotherDevice
+Manufacturer: ABC Company
+IP Address: 192.168.1.20
+...
