@@ -26,6 +26,12 @@ import matplotlib.animation as animation
 
 from matplotlib import style
 
+import calibrationForLBF
+
+import calibrationForRBF
+
+import calibrationForAW
+
 class Speedometer(tk.Canvas):
     def __init__(self, parent, min_value, max_value):
         super().__init__(parent, width=310, height=310)
@@ -150,6 +156,15 @@ class MultiPageApp(tk.Tk):
         self.geometry("1500x770")
         self.minsize(1400,750)
         
+        # Get the directory path where the script is located
+        self.script_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Change the working directory to the script's directory
+        os.chdir(self.script_directory)
+        
+        self.file_path1 = os.path.join(self.script_directory, 'sampleText.txt')
+        self.file_path2 = os.path.join(self.script_directory, 'sampleText2.txt')
+        
         # Create a container to hold all the pages
         self.container = tk.Frame(self)
         self.container.pack(fill="both", expand=True)
@@ -185,8 +200,22 @@ class MultiPageApp(tk.Tk):
         page = self.pages[page_name]
         page.tkraise()
         
+    # Function for increasment of j For Time Graph
+    # j = 0.1
+    def time_increasement(self):
+        global j
+        j = 0.1
+        if j<300.1:
+            j +=0.1
     
     def on_mqttMessage(self, client, userdata, msg):
+        # Cleaning all data from rangeValues.txt file
+        rangeValues_paths = ['rangeValuesForRPM.txt', 'rangeValuesForLBF.txt', 'rangeValuesForRBF.txt', 'rangeValuesForAW.txt']
+        for rangeValues_path in rangeValues_paths:
+            with open(rangeValues_path, "w") as file:
+                file.write("")
+        
+        
         # Here you can update the labels based on the MQTT message
         if msg.topic == "001/TESTER/BREAK/BREAKFORCE":
             # self.pages['Page1'].label1.config(text=msg.payload.decode("utf-8"))
@@ -198,6 +227,70 @@ class MultiPageApp(tk.Tk):
             axle_weight = int(m_in['Axle Weight'])
             rpm = int(m_in['rpm'])
             
+            # Calling back function to increase time    
+            self.time_increasement()
+            
+            # code to calibrate LBF values
+            file_path = "calibrationConfigurationLBFFile.txt"
+            mac_address = "AB:CD:EF:12:34:56"
+            offset = 2
+            coef = 9
+            raw_data = break_force_left
+            value = round(((raw_data - offset)/coef)*0.985, 2)
+            if value > 0:
+                calibrated_variable_lbf = calibrationForLBF.write_range_value(file_path, mac_address, value)
+                m_lbf = calibrated_variable_lbf[0]
+                c_lbf = calibrated_variable_lbf[1]
+                # print(m_lbf,c_lbf)
+                calibrated_lbf = m_lbf*value + c_lbf
+            else:
+                calibrated_lbf = value
+                
+            # write calibrate value on GUI screen and file
+            self.pages['Page1'].lbl2.config(text=calibrated_lbf)
+            file = open(self.file_path1, "a")
+            file.writelines(repr(j) + ',' +repr(calibrated_lbf)+"\n")
+            file.close()
+            
+            # code to calibrate RBF values
+            file_path = "calibrationConfigurationRBFFile.txt"
+            mac_address = "AB:CD:EF:12:34:56"
+            offset = 20
+            coef = 9
+            raw_data = break_force_right
+            value = round(((raw_data - offset)/coef)*0.985, 2)
+            if value > 0:
+                calibrated_variable_rbf = calibrationForRBF.write_range_value(file_path, mac_address, value)
+                m_rbf = calibrated_variable_rbf[0]
+                c_rbf = calibrated_variable_rbf[1]
+                calibrated_rbf = m_rbf*value + c_rbf
+            else:
+                calibrated_rbf = value
+            
+            # write calibrate value on GUI screen and file
+            self.pages['Page1'].lbl3.config(text=calibrated_rbf)
+            file = open(self.file_path2, "a")
+            file.writelines(repr(j) + ',' +repr(calibrated_rbf) +"\n")
+            file.close()
+            
+            # Car Testing Status
+            self.pages['Page1'].car_testing_status(test_status)
+            
+            # Code to calibrate Axle Weight values
+            file_path = "calibrationConfigurationAWFile.txt"
+            mac_address = "AB:CD:EF:12:34:56"
+            offset = 320
+            coef = 90
+            raw_data = axle_weight
+            value = round((raw_data - offset)/coef, 2)
+            calibrated_variable_AW = calibrationForAW.write_range_value(file_path, mac_address, value)
+            m_AW = calibrated_variable_AW[0]
+            c_AW = calibrated_variable_AW[1]
+            calibrated_AW = m_AW*value + c_AW
+            
+            # excelWeightlbl.config(text=axle_weight)
+            self.pages['Page1'].excelWeightlbl.config(text=calibrated_AW)
+                
             
             # speed_list = [0]
             self.speed_list.insert(0, rpm)
@@ -247,6 +340,11 @@ class Page1(tk.Frame):
         # label = tk.Label(self, text="Page 1", font=("Arial", 20))
         # label.pack(pady=20)
         
+        # Get the directory path where the script is located
+        self.script_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Change the working directory to the script's directory
+        os.chdir(self.script_directory)
         
         # Adding background images to make rounded corner of labels
         self.image = Image.open("Green.png")
@@ -276,13 +374,19 @@ class Page1(tk.Frame):
         informationRightlbl.place(x=505, y=120)
 
         # Variable Data Measurment Labeling
-        lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50,15))
-        lbl2.place(x=100, y=200)
+        self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50,15))
+        self.lbl2.place(x=100, y=200)
 
-        lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50, 15))
-        lbl3.place(x=500, y=200)
+        self.lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50, 15))
+        self.lbl3.place(x=500, y=200)
         
         
+        # Code To show axle weight
+        excelWeightlbl_text = Label(self, text="Axle Weight", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 14,'bold'), padding=(20,10))
+        excelWeightlbl_text.place(x=290, y=308)
+
+        self.excelWeightlbl = Label(self, text="1500", foreground=dynamic_data_forground_color, background=dynamic_data_background_color, font=(font_family, 14,'bold'), padding=(20,10))
+        self.excelWeightlbl.place(x=325, y=368)
         
         
 
@@ -319,8 +423,8 @@ class Page1(tk.Frame):
         testing_status_text = Label(self, text="Testing Status:", font=(font_family, 14, 'bold'), background=information_text_background_color, foreground=information_text_forground_color, padding=(20,5))
         testing_status_text.place(x=850, y=115)
 
-        testing_status = Label(self, text="Ideal", font=(font_family, 14, 'bold'), background=dynamic_data_background_color, foreground=dynamic_data_forground_color, padding=(5,5))
-        testing_status.place(x=1050, y=115)
+        self.testing_status = Label(self, text="Ideal", font=(font_family, 14, 'bold'), background=dynamic_data_background_color, foreground=dynamic_data_forground_color, padding=(5,5))
+        self.testing_status.place(x=1050, y=115)
 
         # Test result ok or not ok
         test_result_text = Label(self, text="Test Result:", font=(font_family, 18, 'bold'), background=information_text_background_color, foreground=information_text_forground_color, padding=(20,5))
@@ -374,8 +478,10 @@ class Page1(tk.Frame):
         self.after(100, self.animate_animate)
         # Function to update graph
     def animate(self):
-        pullData = open("sampleText.txt","r").read()
-        pullData2 = open("sampleText2.txt","r").read()
+        file_path1 = os.path.join(self.script_directory, 'sampleText.txt')
+        file_path2 = os.path.join(self.script_directory, 'sampleText2.txt')
+        pullData = open(file_path1,"r").read()
+        pullData2 = open(file_path2,"r").read()
         dataList = pullData.split('\n')
         dataList2 = pullData2.split('\n')
         xList = []
@@ -397,6 +503,21 @@ class Page1(tk.Frame):
         self.a.plot(xList, yList, color='#CC0CA1')
         self.a.plot(xList2, yList2, color='#2BB3E1')
         self.a.tick_params(left = False)
+        
+    # Function to define car testing status
+    def car_testing_status (self, status_code):
+        if status_code == 0:
+            self.testing_status.config(text="Ideal")
+        elif status_code == 1:
+            self.testing_status.config(text="Waiting For Vehicle")
+        elif status_code == 2:
+            self.testing_status.config(text="Starting Test")
+        elif status_code == 3:  
+            self.testing_status.config(text="Test Running")
+        elif status_code == 4:
+            self.testing_status.config(text="Test Finished")
+        elif status_code == 5:
+            self.testing_status.config(text="Test Failed", foreground='red')
     
     
     
