@@ -33,17 +33,24 @@ import calibrationForRBF
 import calibrationForAW
 
 class Speedometer(tk.Canvas):
-    def __init__(self, parent, min_value, max_value):
-        super().__init__(parent, width=310, height=310)
+    def __init__(self, parent,parent_width, parent_height, min_value, max_value, oval_radius_width, oval_radius_height, center_x, center_y, num_ticks_radius, ticks_radius, needle_quad_height, needle_quad_width, needle_quad_height_y3_y4):
+        super().__init__(parent, width=parent_width, height=parent_height)
         self.min_value = min_value
         self.max_value = max_value
         self.value = min_value
+        self.oval_radius_width = oval_radius_width
+        self.oval_radius_height = oval_radius_height
+        self.num_ticks_radius = num_ticks_radius
+        self.ticks_radius = ticks_radius
+        self.needle_quad_height = needle_quad_height
+        self.needle_quad_width = needle_quad_width
+        self.needle_quad_height_y3_y4 = needle_quad_height_y3_y4
         
-        self.center_x = 150
-        self.center_y = 150
+        self.center_x = center_x
+        self.center_y = center_y
 
         self.configure(bg=self_background_color, highlightthickness=0)
-        self.create_oval(0, 0, 300, 300, width=3, outline='white', fill='black', )
+        self.create_oval(0, 0, oval_radius_width, oval_radius_height, width=3, outline='white', fill='black', )
         self.create_text(150, 150, text='Speed', font=('Arial', 16))
         self.value_text = self.create_text(150, 180, text=str(self.value), font=('Arial', 24, 'bold'))
         
@@ -54,10 +61,10 @@ class Speedometer(tk.Canvas):
 
         for i in range(num_ticks):
             angle = -215 + i * angle_increment  # Calculate the angle for the tick mark
-            radius = 110  # Radius for the tick mark
+            radius = self.num_ticks_radius  # Radius for the tick mark
 
-            x = 150 + radius * math.cos(math.radians(angle))
-            y = 150 + radius * math.sin(math.radians(angle))
+            x = self.center_x + radius * math.cos(math.radians(angle))
+            y = self.center_y + radius * math.sin(math.radians(angle))
 
             value = int(min_value + (max_value - min_value) / (num_ticks - 1) * i)  # Calculate the value for the tick mark
             # values = [0,4,8,12,16,20,24,28,32,36,40]
@@ -67,7 +74,7 @@ class Speedometer(tk.Canvas):
             
         # Drawing big ticks on analog gauge
         for angle in range(-25, 225, 30):  # Draw ticks every 30 degrees
-            radius1 =120
+            radius1 = self.ticks_radius
             angle_rad = math.radians(angle)
             x1 = self.center_x + (radius1 + 5) * math.cos(angle_rad)
             y1 = self.center_y - (radius1 + 5) * math.sin(angle_rad)
@@ -77,7 +84,7 @@ class Speedometer(tk.Canvas):
         
         # Drawing big ticks on analog gauge
         for angle in range(-25, 220, 5):  # Draw ticks every 5 degrees
-            radius1 =120
+            radius1 = self.ticks_radius
             angle_rad = math.radians(angle)
             x1 = self.center_x + (radius1 + 18) * math.cos(angle_rad)
             y1 = self.center_y - (radius1 + 18) * math.sin(angle_rad)
@@ -95,19 +102,19 @@ class Speedometer(tk.Canvas):
         angle = 55 + self.value
 
         # Calculate the coordinates of the quadrilateral points
-        center_x = 150
-        center_y = 150
-        quad_width = 30
-        quad_height = 80
+        center_x = self.center_x
+        center_y = self.center_y
+        quad_width = self.needle_quad_width
+        quad_height = self.needle_quad_height
 
         x1 = center_x - quad_width / 2
         y1 = center_y - quad_height / 2
         x2 = center_x + quad_width / 2
         y2 = center_y - quad_height / 2
         x3 = center_x + 1 / 2
-        y3 = center_y + 240 / 2
+        y3 = center_y + self.needle_quad_height_y3_y4 / 2
         x4 = center_x - 1 / 2
-        y4 = center_y + 240 / 2
+        y4 = center_y + self.needle_quad_height_y3_y4 / 2
 
         # Rotate the quadrilateral based on the angle
         rotated_points = rotate_points([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], center_x, center_y, angle)
@@ -139,14 +146,14 @@ def rotate_points(points, center_x, center_y, angle):
 
 
 # Color variable to store color
-self_background_color = '#9AD9EA'
+self_background_color = '#000087'
 dynamic_data_background_color = '#81D697'
 dynamic_data_forground_color = '#000000'
 information_text_background_color = '#4CF701'
 information_text_forground_color = '#790140'
 # Font family variable
 font_family = 'Helvetica'
-
+j = 0.1
 
 class MultiPageApp(tk.Tk):
     def __init__(self):
@@ -185,7 +192,13 @@ class MultiPageApp(tk.Tk):
         # Show the initial page
         self.show_page("Page1")
         
+        # Define variable to update needle position
         self.speed_list = [0]
+        self.lbf_list = [0]
+        self.rbf_list = [0]
+        self.axel_weight_list = [0]
+        
+        
         # MQTT All Process Code Is Here
         self.mqttBroker = "3.110.187.253"
         self.client = mqtt.Client("Smartphone")
@@ -204,7 +217,6 @@ class MultiPageApp(tk.Tk):
     # j = 0.1
     def time_increasement(self):
         global j
-        j = 0.1
         if j<300.1:
             j +=0.1
     
@@ -229,6 +241,7 @@ class MultiPageApp(tk.Tk):
             
             # Calling back function to increase time    
             self.time_increasement()
+            print(j)
             
             # code to calibrate LBF values
             file_path = "calibrationConfigurationLBFFile.txt"
@@ -292,6 +305,8 @@ class MultiPageApp(tk.Tk):
             self.pages['Page1'].excelWeightlbl.config(text=calibrated_AW)
                 
             
+            ######################### GAUGE NEEDLE UPDATE on_message EVENT #####################################
+            # Updating Gauge needle of Speed for page 2
             # speed_list = [0]
             self.speed_list.insert(0, rpm)
             for i in range(len(self.speed_list)):
@@ -305,12 +320,58 @@ class MultiPageApp(tk.Tk):
             if self.speed_list[0] > self.speed_list[1]:
                 for i in range(self.speed_list[0] - self.speed_list[1]):
                     actual_speed[0] += 1
-                    self.pages['Page1'].speedometer.update_speed(actual_speed[0])
+                    self.pages['Page2'].speedometer.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             else:
                 for i in range(self.speed_list[1] - self.speed_list[0]):
                     actual_speed[0] -= 1
-                    self.speedometer.update_speed(actual_speed[0])
+                    self.pages['Page2'].speedometer.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            
+            # Updating Gauge needle of Left Break Force
+            # speed_list = [0]
+            int_calibrated_lbf = int(calibrated_lbf)
+            self.lbf_list.insert(0, int_calibrated_lbf)
+            for i in range(len(self.lbf_list)):
+                if len(self.lbf_list) > 2:
+                    self.lbf_list.pop(2)
+                else:
+                    pass
+            print(self.lbf_list)
+            
+            actual_speed = [self.lbf_list[1]]
+            if self.lbf_list[0] > self.lbf_list[1]:
+                for i in range(self.lbf_list[0] - self.lbf_list[1]):
+                    actual_speed[0] += 1
+                    self.pages['Page1'].speedometer.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            else:
+                for i in range(self.lbf_list[1] - self.lbf_list[0]):
+                    actual_speed[0] -= 1
+                    self.pages['Page1'].speedometer.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            
+            # Updating Gauge needle of Right Break Force
+            # speed_list = [0]
+            int_calibrated_rbf = int(calibrated_rbf)
+            self.rbf_list.insert(0, int_calibrated_rbf)
+            for i in range(len(self.rbf_list)):
+                if len(self.rbf_list) > 2:
+                    self.rbf_list.pop(2)
+                else:
+                    pass
+            print(self.rbf_list)
+            
+            actual_speed = [self.rbf_list[1]]
+            if self.rbf_list[0] > self.rbf_list[1]:
+                for i in range(self.rbf_list[0] - self.rbf_list[1]):
+                    actual_speed[0] += 1
+                    self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            else:
+                for i in range(self.rbf_list[1] - self.rbf_list[0]):
+                    actual_speed[0] -= 1
+                    self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             
             
@@ -374,19 +435,19 @@ class Page1(tk.Frame):
         informationRightlbl.place(x=505, y=120)
 
         # Variable Data Measurment Labeling
-        self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50,15))
+        self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50,15))
         self.lbl2.place(x=100, y=200)
 
         self.lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, font=('font_family', 20,'bold'), padding=(50, 15))
-        self.lbl3.place(x=500, y=200)
+        self.lbl3.place(x=600, y=200)
         
         
         # Code To show axle weight
         excelWeightlbl_text = Label(self, text="Axle Weight", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 14,'bold'), padding=(20,10))
-        excelWeightlbl_text.place(x=290, y=308)
+        excelWeightlbl_text.place(x=350, y=508)
 
         self.excelWeightlbl = Label(self, text="1500", foreground=dynamic_data_forground_color, background=dynamic_data_background_color, font=(font_family, 14,'bold'), padding=(20,10))
-        self.excelWeightlbl.place(x=325, y=368)
+        self.excelWeightlbl.place(x=385, y=568)
         
         
 
@@ -395,13 +456,13 @@ class Page1(tk.Frame):
         self.f = Figure(figsize=(5,5), dpi=60)
         self.a = self.f.add_subplot(111)
         
-        canvas = FigureCanvasTkAgg(self.f, self)
-        canvas.get_tk_widget().place(x=850, y=220)
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().place(x=850, y=220)
 
         # To show tool bar for graph on window
-        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
         toolbar.update()
-        canvas._tkcanvas.place(x=1100, y=160)
+        self.canvas._tkcanvas.place(x=1100, y=160)
 
         # To update animate function at a interval of point of time
         # ani = animation.FuncAnimation(self.f, animate, interval=100)
@@ -455,12 +516,15 @@ class Page1(tk.Frame):
         
         
         speed_list = [0]
-        self.speedometer = Speedometer(self, min_value=0, max_value=160)
-        speedometer1 = Speedometer(self, min_value=0, max_value=160)
+        self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=160, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
+        self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=160, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
+        self.axle_speedometer = Speedometer(self, parent_width=220, parent_height=200, min_value=0, max_value=160, oval_radius_width=200, oval_radius_height=200, center_x=100, center_y=100, num_ticks_radius=60, ticks_radius=70, needle_quad_height=40, needle_quad_width=20, needle_quad_height_y3_y4 = 140)
         self.speedometer.place(x=10, y=300)
-        speedometer1.place(x=400, y=300)
-        speedometer1.update_speed(speed_list[0])
+        self.speedometer1.place(x=600, y=300)
+        self.axle_speedometer.place(x=350, y=200)
         self.speedometer.update_speed(speed_list[0])
+        self.speedometer1.update_speed(speed_list[0])
+        self.axle_speedometer.update_speed(speed_list[0])
         
         
         button = tk.Button(self, text="Next", width=10,font =
@@ -468,14 +532,14 @@ class Page1(tk.Frame):
         button.place(x=1375, y=670)
         
         
-    def update_speedometer(self, speed):
-        self.speedometer.update_speed(40)
+    # def update_speedometer(self, speed):
+    #     self.speedometer.update_speed(40)
         
     def animate_animate(self):
         # Call the animate function to update the graph
         self.animate()
         # Schedule the next animation after 100ms (adjust the interval as needed)
-        self.after(100, self.animate_animate)
+        self.after(1000, self.animate_animate)
         # Function to update graph
     def animate(self):
         file_path1 = os.path.join(self.script_directory, 'sampleText.txt')
@@ -488,6 +552,7 @@ class Page1(tk.Frame):
         yList = []
         xList2 = []
         yList2 = []
+        print("Yes i am also execuring")
         for eachLine in dataList:
             if len(eachLine) > 1:
                 x, y = eachLine.split(',')
@@ -503,6 +568,8 @@ class Page1(tk.Frame):
         self.a.plot(xList, yList, color='#CC0CA1')
         self.a.plot(xList2, yList2, color='#2BB3E1')
         self.a.tick_params(left = False)
+        # Refresh the canvas to show the updated plot
+        self.canvas.draw()
         
     # Function to define car testing status
     def car_testing_status (self, status_code):
@@ -535,15 +602,44 @@ class Page1(tk.Frame):
 class Page2(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.config(background=self_background_color)
         
-        label = tk.Label(self, text="Page 2", font=("Arial", 20))
-        label.pack(pady=20)
+        # label = tk.Label(self, text="Page 2", font=("Arial", 20))
+        # label.pack(pady=20)
         
-        button = tk.Button(self, text="Go to Page 1", command=lambda: controller.show_page("Page1"))
-        button.pack()
+        # Heading Labeling
+        lbl1 = Label(self,text="Please Accelerate To Max", foreground="white", background="black", font=(font_family, 25, 'bold'), width=100, padding=(250, 20))
+        lbl1.pack()
         
-        label = tk.Label(self, text="This is Page 2", font=("Arial", 20))
-        label.place(x=400, y=200)
+        
+        speed_list = [0]
+        self.speedometer = Speedometer(self, parent_width=410, parent_height=410, min_value=0, max_value=160, oval_radius_width=400, oval_radius_height=400, center_x=200, center_y=200, num_ticks_radius=160, ticks_radius=170, needle_quad_height=130, needle_quad_width=40, needle_quad_height_y3_y4 = 340)
+        self.speedometer.place(x=500, y=200)
+        self.speedometer.update_speed(speed_list[0])
+        
+        self.speed_label = Label(self, text="20", foreground="white", background='black',borderwidth=5, relief='solid', font=(font_family, 25, 'bold'), padding=(100, 20))
+        self.speed_label.place(x=580, y=565)
+        
+        # Create a frame with a fixed size
+        frame = tk.Frame(self, bg="white", borderwidth=5, relief="solid", width=200, height=100)
+        frame.pack(padx=50, pady=50)
+
+        # Create a label inside the frame, configure it to fill the frame
+        label = tk.Label(frame, text="Hello, World! hi, there how are you!", bg="white")
+        label.pack(fill="both", expand=True)  # Fill the available space in the frame
+                
+        
+        
+        
+        # button = tk.Button(self, text="Go to Page 1", command=lambda: controller.show_page("Page1"))
+        # button.pack()
+        button = tk.Button(self, text="Prev", width=10,font =
+                    ('calibri', 13, 'bold'),  command=lambda: controller.show_page("Page1"))
+        button.place(x=1175, y=670)
+        
+        button = tk.Button(self, text="Next", width=10,font =
+                    ('calibri', 13, 'bold'),  command=lambda: controller.show_page("#"))
+        button.place(x=1375, y=670)
 
 
 
