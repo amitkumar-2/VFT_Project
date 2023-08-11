@@ -374,6 +374,30 @@ class MultiPageApp(tk.Tk):
                     self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             
+            # Updating Gauge needle of Axle Weight
+            # speed_list = [0]
+            int_calibrated_AW = int(calibrated_AW)
+            self.axel_weight_list.insert(0, int_calibrated_AW)
+            for i in range(len(self.axel_weight_list)):
+                if len(self.axel_weight_list) > 2:
+                    self.axel_weight_list.pop(2)
+                else:
+                    pass
+            print(self.axel_weight_list)
+            
+            actual_speed = [self.axel_weight_list[1]]
+            if self.axel_weight_list[0] > self.axel_weight_list[1]:
+                for i in range(self.axel_weight_list[0] - self.axel_weight_list[1]):
+                    actual_speed[0] += 1
+                    self.pages['Page1'].axle_speedometer.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            else:
+                for i in range(self.axel_weight_list[1] - self.axel_weight_list[0]):
+                    actual_speed[0] -= 1
+                    self.pages['Page1'].axle_speedometer.update_speed(actual_speed[0])
+                    time.sleep(0.0001)
+            
+            
             
         elif msg.topic == "topic2":
             self.pages['Page1'].label2.config(text=msg.payload.decode("utf-8"))
@@ -620,13 +644,11 @@ class Page2(tk.Frame):
         self.speed_label = Label(self, text="20", foreground="white", background='black',borderwidth=5, relief='solid', font=(font_family, 25, 'bold'), padding=(100, 20))
         self.speed_label.place(x=580, y=565)
         
-        # Create a frame with a fixed size
-        frame = tk.Frame(self, bg="white", borderwidth=5, relief="solid", width=200, height=100)
-        frame.pack(padx=50, pady=50)
-
-        # Create a label inside the frame, configure it to fill the frame
-        label = tk.Label(frame, text="Hello, World! hi, there how are you!", bg="white")
-        label.pack(fill="both", expand=True)  # Fill the available space in the frame
+        # Create a frame with ridge border style
+        frame_width = 200
+        frame_height = 100
+        frame = tk.Frame(self, width=frame_width, height=frame_height, highlightbackground="red", highlightcolor="red", highlightthickness=10, relief="ridge")
+        frame.pack()
                 
         
         
@@ -640,11 +662,6 @@ class Page2(tk.Frame):
         button = tk.Button(self, text="Next", width=10,font =
                     ('calibri', 13, 'bold'),  command=lambda: controller.show_page("#"))
         button.place(x=1375, y=670)
-
-
-
-
-
 
 
 
