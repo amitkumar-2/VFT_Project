@@ -156,7 +156,7 @@ font_family = 'Helvetica'
 j = 0.1
 
 class MultiPageApp(tk.Tk):
-    def __init__(self):
+    def __init__(self, mqtt_client):
         super().__init__()
         self.title("CTI Vehicle Fitness Test")
         self.iconbitmap(r"C:\Users\cti-2\Downloads\R&D Team WhatsappFiles\CTIWhatsappForMe\WhatsApp-Image-2023-06-17-at-11.15.32-AM-_1_.ico")
@@ -181,7 +181,7 @@ class MultiPageApp(tk.Tk):
         # Create and add pages to the dictionary
         for PageClass in [Page1, Page2]:
             page_name = PageClass.__name__
-            page = PageClass(self.container, self)
+            page = PageClass(self.container, self, mqtt_client)
             self.pages[page_name] = page
             page.grid(row=0, column=0, sticky="nsew")
         
@@ -201,7 +201,8 @@ class MultiPageApp(tk.Tk):
         
         # MQTT All Process Code Is Here
         self.mqttBroker = "3.110.187.253"
-        self.client = mqtt.Client("Smartphone")
+        self.client = mqtt_client
+        # self.client = mqtt.Client("Smartphone")
         self.client.on_message = self.on_mqttMessage
         self.client.on_connect = self.on_mqttConnect
         self.client.connect(self.mqttBroker,1883,60)
@@ -418,9 +419,12 @@ class MultiPageApp(tk.Tk):
 
 class Page1(tk.Frame):
     
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, mqtt_client):
         super().__init__(parent)
         self.config(background=self_background_color)
+        
+        self.client = mqtt_client  # Store the MQTT client instance
+        # print(self.client)
         
         # label = tk.Label(self, text="Page 1", font=("Arial", 20))
         # label.pack(pady=20)
@@ -532,7 +536,7 @@ class Page1(tk.Frame):
         s1.configure("Custom.TButton", foreground=information_text_forground_color, background='white', font =
                     ('calibri', 13, 'bold'))
 
-        button = Button(self, text="Reset", width=10, style="Custom.TButton") #, command=run
+        button = Button(self, text="Reset", width=10, style="Custom.TButton", command=self.run)
         button.place(x=1175, y=670)
 
         button.bind("<Enter>", on_enter)
@@ -540,8 +544,8 @@ class Page1(tk.Frame):
         
         
         speed_list = [0]
-        self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=160, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
-        self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=160, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
+        self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
+        self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
         self.axle_speedometer = Speedometer(self, parent_width=220, parent_height=200, min_value=0, max_value=160, oval_radius_width=200, oval_radius_height=200, center_x=100, center_y=100, num_ticks_radius=60, ticks_radius=70, needle_quad_height=40, needle_quad_width=20, needle_quad_height_y3_y4 = 140)
         self.speedometer.place(x=10, y=300)
         self.speedometer1.place(x=600, y=300)
@@ -558,6 +562,20 @@ class Page1(tk.Frame):
         
     # def update_speedometer(self, speed):
     #     self.speedometer.update_speed(40)
+        
+    
+    
+    
+    def publish_msg(self, topic,msg):
+        print("Yes")
+        self.client.publish(topic,msg)
+        
+    # Function to reset page
+    def run(self):
+        self.reset_first_page()
+    def reset_first_page (self):
+        self.publish_msg('001/OPERATOR/BREAK/REQ', 'START_TEST')
+        
         
     def animate_animate(self):
         # Call the animate function to update the graph
@@ -624,7 +642,7 @@ class Page1(tk.Frame):
         
 
 class Page2(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, mqtt_client):
         super().__init__(parent)
         self.config(background=self_background_color)
         
@@ -666,5 +684,6 @@ class Page2(tk.Frame):
 
 
 if __name__ == "__main__":
-    app = MultiPageApp()
+    mqtt_client = mqtt.Client("Smartphone")
+    app = MultiPageApp(mqtt_client)
     app.mainloop()
