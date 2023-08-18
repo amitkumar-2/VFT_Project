@@ -55,7 +55,7 @@ class Speedometer(tk.Canvas):
         self.configure(bg=self_background_color, highlightthickness=0)
         self.create_oval(0, 0, oval_radius_width, oval_radius_height, width=3, outline='white', fill='black', )
         self.create_text(gauge_info_text_x, gauge_info_text_y, text=self.gauge_info_text, font=('Arial', 12), fill='white')
-        self.value_text = self.create_text(150, 200, text=str(self.value), font=('Arial', 24, 'bold'), fill='white')
+        # self.value_text = self.create_text(150, 200, text=str(self.value), font=('Arial', 24, 'bold'), fill='white')
         
         # Add number indications
         num_ticks = 9  # Number of tick marks
@@ -98,7 +98,7 @@ class Speedometer(tk.Canvas):
 
     def update_speed(self, speed):
         self.value = speed
-        self.itemconfigure(self.value_text, text=str(self.value))
+        # self.itemconfigure(self.value_text, text=str(self.value))
 
         # Calculate the angle for the needle
         angle = (self.value - self.min_value) / (self.max_value - self.min_value) * 180 - 90
@@ -155,7 +155,7 @@ dynamic_data_forground_color = 'white'
 information_text_background_color = '#4CF701'
 information_text_forground_color = '#790140'
 # Font family variable
-font_family = 'Helvetica'
+font_family = 'Courier New'
 j = 0.1
 
 class MultiPageApp(tk.Tk):
@@ -264,7 +264,7 @@ class MultiPageApp(tk.Tk):
                 calibrated_lbf = value
                 
             # write calibrate value on GUI screen and file
-            self.pages['Page1'].lbl2.config(text=calibrated_lbf)
+            self.pages['Page1'].lbl2.update_text(new_text=calibrated_lbf)
             file = open(self.file_path1, "a")
             file.writelines(repr(j) + ',' +repr(calibrated_lbf)+"\n")
             file.close()
@@ -562,12 +562,15 @@ class Page1(tk.Frame):
         self.axle_speedometer.update_speed(speed_list[0])
         
         # Variable Data Measurment Labeling
-        self.bg_color_for_lbl2 = Label(self, text="0", foreground=self_background_color,borderwidth=2, relief="ridge", background=self_background_color, padding=(101,20))
+        self.bg_color_for_lbl2 = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(101,20))
         self.bg_color_for_lbl2.place(x=85, y=560)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
-        label = CenteredTextLabel(self, text="10", foreground='#CC0CA1', background=self_background_color, font=('Arial', 20, 'bold'), width=10)
-        label.place(x=160, y=200, anchor="center")
+        self.lbl2 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
+        self.lbl2.place(x=187, y=590, anchor="center")
+        
+
+        
 
         
 
@@ -659,8 +662,13 @@ class CenteredTextLabel(tk.Label):
         self.frame.pack(fill="both", expand=True)
         
         # Create a label inside the frame and center it
-        self.label = tk.Label(self.frame, text=text, bg=self["background"], fg=self["foreground"], font=self["font"], width=self["width"], borderwidth=5, relief="ridge")
+        self.label = tk.Label(self.frame, text=text, bg=self["background"], fg=self["foreground"], font=self["font"], width=self["width"]) # , borderwidth=5, relief="ridge"
         self.label.pack(side="top", fill="both", expand=True)
+        
+    def update_text(self, new_text):
+        self.label.config(text=new_text)
+
+
 
 
 # Function to reset page
