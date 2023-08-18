@@ -3,5 +3,5 @@ AB:CD:EF:12:34:56
 # rpm_range_1
 range_min = 0
 range_max = 1500
-m = 1
+m = 10.999
 c = 0

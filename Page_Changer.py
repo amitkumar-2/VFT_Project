@@ -33,7 +33,7 @@ import calibrationForRBF
 import calibrationForAW
 
 class Speedometer(tk.Canvas):
-    def __init__(self, parent,parent_width, parent_height, min_value, max_value, oval_radius_width, oval_radius_height, center_x, center_y, num_ticks_radius, ticks_radius, needle_quad_height, needle_quad_width, needle_quad_height_y3_y4):
+    def __init__(self, parent,parent_width, parent_height, min_value, max_value, oval_radius_width, oval_radius_height, center_x, center_y, num_ticks_radius, ticks_radius, needle_quad_height, needle_quad_width, needle_quad_height_y3_y4, gauge_info_text, gauge_info_text_x, gauge_info_text_y):
         super().__init__(parent, width=parent_width, height=parent_height)
         self.min_value = min_value
         self.max_value = max_value
@@ -45,14 +45,17 @@ class Speedometer(tk.Canvas):
         self.needle_quad_height = needle_quad_height
         self.needle_quad_width = needle_quad_width
         self.needle_quad_height_y3_y4 = needle_quad_height_y3_y4
+        self.gauge_info_text = gauge_info_text
+        self.gauge_info_text_x = gauge_info_text_x
+        self.gauge_info_text_y = gauge_info_text_y
         
         self.center_x = center_x
         self.center_y = center_y
 
         self.configure(bg=self_background_color, highlightthickness=0)
         self.create_oval(0, 0, oval_radius_width, oval_radius_height, width=3, outline='white', fill='black', )
-        self.create_text(100, 100, text='Speed', font=('Arial', 16), fill='white')
-        self.value_text = self.create_text(150, 180, text=str(self.value), font=('Arial', 24, 'bold'), fill='white')
+        self.create_text(gauge_info_text_x, gauge_info_text_y, text=self.gauge_info_text, font=('Arial', 12), fill='white')
+        self.value_text = self.create_text(150, 200, text=str(self.value), font=('Arial', 24, 'bold'), fill='white')
         
         # Add number indications
         num_ticks = 9  # Number of tick marks
@@ -282,6 +285,7 @@ class MultiPageApp(tk.Tk):
                 calibrated_rbf = value
             
             # write calibrate value on GUI screen and file
+            calibrated_rbf = float(f"{calibrated_rbf:.2f}") # formating calibrated_rbf with two decible points
             self.pages['Page1'].lbl3.config(text=calibrated_rbf)
             file = open(self.file_path2, "a")
             file.writelines(repr(j) + ',' +repr(calibrated_rbf) +"\n")
@@ -367,7 +371,10 @@ class MultiPageApp(tk.Tk):
             if self.rbf_list[0] > self.rbf_list[1]:
                 for i in range(self.rbf_list[0] - self.rbf_list[1]):
                     actual_speed[0] += 1
-                    self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
+                    if actual_speed[0] < 250:
+                        self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
+                    else:
+                        pass
                     time.sleep(0.0001)
             else:
                 for i in range(self.rbf_list[1] - self.rbf_list[0]):
@@ -441,14 +448,14 @@ class Page1(tk.Frame):
         self.image = self.image.resize((width, height), Image.ANTIALIAS)
         self.image_tk = ImageTk.PhotoImage(self.image)
         labelimg = Label(self, image=self.image_tk, relief='flat', borderwidth=0, background=self_background_color)
-        labelimg.place(x=650, y=100)
+        # labelimg.place(x=650, y=100)
 
         self.image1 = Image.open("Green.png")
         width, height = 285, 70
         self.image1 = self.image1.resize((width, height), Image.ANTIALIAS)
         self.image1_tk = ImageTk.PhotoImage(self.image1)
         labelimg1 = Label(self, image=self.image1_tk, relief='flat', borderwidth=0, background=self_background_color)
-        labelimg1.place(x=55, y=100)
+        # labelimg1.place(x=55, y=100)
         
         
         # Heading Labeling
@@ -456,23 +463,23 @@ class Page1(tk.Frame):
         lbl1.pack()
 
         # Informating Text Labeling
-        informationLeftlbl = Label(self, text="Break Force Left", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 15,'bold'))
-        informationLeftlbl.place(x=125, y=120)
+        # informationLeftlbl = Label(self, text="Break Force Left", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 15,'bold'))
+        # informationLeftlbl.place(x=125, y=120)
 
-        informationRightlbl = Label(self, text="Break Force Right", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 15,'bold'))
-        informationRightlbl.place(x=715, y=120)
+        # informationRightlbl = Label(self, text="Break Force Right", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 15,'bold'))
+        # informationRightlbl.place(x=715, y=120)
 
         # Variable Data Measurment Labeling
-        self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50,15))
-        self.lbl2.place(x=130, y=200)
+        # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50,15))
+        # self.lbl2.place(x=130, y=200)
 
         self.lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50, 15))
         self.lbl3.place(x=740, y=200)
         
         
         # Code To show axle weight
-        excelWeightlbl_text = Label(self, text="Axle Weight", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 14,'bold'), padding=(20,10))
-        excelWeightlbl_text.place(x=350, y=508)
+        # excelWeightlbl_text = Label(self, text="Axle Weight", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 14,'bold'), padding=(20,10))
+        # excelWeightlbl_text.place(x=350, y=508)
 
         self.excelWeightlbl = Label(self, text="1500", foreground=dynamic_data_forground_color, background=dynamic_data_background_color, font=(font_family, 14,'bold'), padding=(20,10))
         self.excelWeightlbl.place(x=385, y=568)
@@ -544,9 +551,9 @@ class Page1(tk.Frame):
         
         
         speed_list = [0]
-        self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
-        self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240)
-        self.axle_speedometer = Speedometer(self, parent_width=220, parent_height=200, min_value=0, max_value=160, oval_radius_width=200, oval_radius_height=200, center_x=100, center_y=100, num_ticks_radius=60, ticks_radius=70, needle_quad_height=40, needle_quad_width=20, needle_quad_height_y3_y4 = 140)
+        self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240, gauge_info_text="Left Break Force [kN]", gauge_info_text_x = 155, gauge_info_text_y = 230)
+        self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240, gauge_info_text="Right Break Force [kN]", gauge_info_text_x = 155, gauge_info_text_y = 230)
+        self.axle_speedometer = Speedometer(self, parent_width=220, parent_height=200, min_value=0, max_value=160, oval_radius_width=200, oval_radius_height=200, center_x=100, center_y=100, num_ticks_radius=60, ticks_radius=70, needle_quad_height=40, needle_quad_width=20, needle_quad_height_y3_y4 = 140, gauge_info_text="Axle Weight", gauge_info_text_x = 100, gauge_info_text_y = 145)
         self.speedometer.place(x=40, y=300)
         self.speedometer1.place(x=650, y=300)
         self.axle_speedometer.place(x=395, y=250)
@@ -554,6 +561,16 @@ class Page1(tk.Frame):
         self.speedometer1.update_speed(speed_list[0])
         self.axle_speedometer.update_speed(speed_list[0])
         
+        # Variable Data Measurment Labeling
+        self.bg_color_for_lbl2 = Label(self, text="0", foreground=self_background_color,borderwidth=2, relief="ridge", background=self_background_color, padding=(101,20))
+        self.bg_color_for_lbl2.place(x=85, y=560)
+        # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
+        # self.lbl2.place(x=130, y=200, anchor="center")
+        label = CenteredTextLabel(self, text="10", foreground='#CC0CA1', background=self_background_color, font=('Arial', 20, 'bold'), width=10)
+        label.place(x=160, y=200, anchor="center")
+
+        
+
         
         button = tk.Button(self, text="Next", width=10,font =
                     ('calibri', 13, 'bold'),  command=lambda: controller.show_page("Page2"))
@@ -633,6 +650,19 @@ class Page1(tk.Frame):
 
     
     
+class CenteredTextLabel(tk.Label):
+    def __init__(self, parent, text, **kwargs):
+        super().__init__(parent, **kwargs)
+        
+        # Create a frame inside the label
+        self.frame = tk.Frame(self, bg=self["background"])
+        self.frame.pack(fill="both", expand=True)
+        
+        # Create a label inside the frame and center it
+        self.label = tk.Label(self.frame, text=text, bg=self["background"], fg=self["foreground"], font=self["font"], width=self["width"], borderwidth=5, relief="ridge")
+        self.label.pack(side="top", fill="both", expand=True)
+
+
 # Function to reset page
 # def run():
 #     reset_first_page(root)
@@ -655,7 +685,7 @@ class Page2(tk.Frame):
         
         
         speed_list = [0]
-        self.speedometer = Speedometer(self, parent_width=410, parent_height=410, min_value=0, max_value=160, oval_radius_width=400, oval_radius_height=400, center_x=200, center_y=200, num_ticks_radius=160, ticks_radius=170, needle_quad_height=130, needle_quad_width=40, needle_quad_height_y3_y4 = 340)
+        self.speedometer = Speedometer(self, parent_width=410, parent_height=410, min_value=0, max_value=160, oval_radius_width=400, oval_radius_height=400, center_x=200, center_y=200, num_ticks_radius=160, ticks_radius=170, needle_quad_height=130, needle_quad_width=40, needle_quad_height_y3_y4 = 340, gauge_info_text="Speed", gauge_info_text_x = 150, gauge_info_text_y = 260)
         self.speedometer.place(x=500, y=200)
         self.speedometer.update_speed(speed_list[0])
         
