@@ -286,7 +286,7 @@ class MultiPageApp(tk.Tk):
             
             # write calibrate value on GUI screen and file
             calibrated_rbf = float(f"{calibrated_rbf:.2f}") # formating calibrated_rbf with two decible points
-            self.pages['Page1'].lbl3.config(text=calibrated_rbf)
+            self.pages['Page1'].lbl3.update_text(new_text=calibrated_rbf)
             file = open(self.file_path2, "a")
             file.writelines(repr(j) + ',' +repr(calibrated_rbf) +"\n")
             file.close()
@@ -473,8 +473,8 @@ class Page1(tk.Frame):
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50,15))
         # self.lbl2.place(x=130, y=200)
 
-        self.lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50, 15))
-        self.lbl3.place(x=740, y=200)
+        # self.lbl3 = Label(self, text="0", foreground='#0187D5', background=dynamic_data_background_color, borderwidth=20, relief="ridge", font=('font_family', 20,'bold'), padding=(50, 15))
+        # self.lbl3.place(x=740, y=200)
         
         
         # Code To show axle weight
@@ -568,6 +568,14 @@ class Page1(tk.Frame):
         # self.lbl2.place(x=130, y=200, anchor="center")
         self.lbl2 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
         self.lbl2.place(x=187, y=590, anchor="center")
+        
+        # Variable Data Measurment Labeling
+        self.bg_color_for_lbl3 = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(101,20))
+        self.bg_color_for_lbl3.place(x=698, y=560)
+        # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
+        # self.lbl2.place(x=130, y=200, anchor="center")
+        self.lbl3 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
+        self.lbl3.place(x=800, y=590, anchor="center")
         
 
         
