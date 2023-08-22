@@ -32,6 +32,7 @@ import calibrationForRBF
 
 import calibrationForAW
 
+# Creating Analog Gauge object to creat multiple Diagram
 class Speedometer(tk.Canvas):
     def __init__(self, parent,parent_width, parent_height, min_value, max_value, oval_radius_width, oval_radius_height, center_x, center_y, num_ticks_radius, ticks_radius, needle_quad_height, needle_quad_width, needle_quad_height_y3_y4, gauge_info_text, gauge_info_text_x, gauge_info_text_y):
         super().__init__(parent, width=parent_width, height=parent_height)
@@ -52,6 +53,7 @@ class Speedometer(tk.Canvas):
         self.center_x = center_x
         self.center_y = center_y
 
+        # Creating basis of analog gauge with oval and information text
         self.configure(bg=self_background_color, highlightthickness=0)
         self.create_oval(0, 0, oval_radius_width, oval_radius_height, width=3, outline='white', fill='black', )
         self.create_text(gauge_info_text_x, gauge_info_text_y, text=self.gauge_info_text, font=('Arial', 12), fill='white')
@@ -85,7 +87,7 @@ class Speedometer(tk.Canvas):
             y2 = self.center_y - (radius1 + 30) * math.sin(angle_rad)
             self.create_line(x1, y1, x2, y2, fill='white', width=2)
         
-        # Drawing big ticks on analog gauge
+        # Drawing small ticks on analog gauge
         for angle in range(-25, 220, 5):  # Draw ticks every 5 degrees
             radius1 = self.ticks_radius
             angle_rad = math.radians(angle)
@@ -96,6 +98,7 @@ class Speedometer(tk.Canvas):
             self.create_line(x1, y1, x2, y2, fill='white', width=2)
 
 
+    # Updating speed of needle
     def update_speed(self, speed):
         self.value = speed
         # self.itemconfigure(self.value_text, text=str(self.value))
@@ -133,9 +136,7 @@ class Speedometer(tk.Canvas):
     
     
             
-                
-                
-
+# Return rotate points for needle
 def rotate_points(points, center_x, center_y, angle):
     rotated_points = []
     for x, y in points:
@@ -146,18 +147,20 @@ def rotate_points(points, center_x, center_y, angle):
 
 
 
-
-
 # Color variable to store color
 self_background_color = '#000087'
 dynamic_data_background_color =  'black' #'#81D697'
 dynamic_data_forground_color = 'white'
 information_text_background_color = '#4CF701'
 information_text_forground_color = '#790140'
+
 # Font family variable
 font_family = 'Courier New'
+
+# define j variable for time increasement
 j = 0.1
 
+# Define class to make multipages tkinter App
 class MultiPageApp(tk.Tk):
     def __init__(self, mqtt_client):
         super().__init__()
