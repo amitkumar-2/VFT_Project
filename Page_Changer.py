@@ -481,8 +481,8 @@ class Page1(tk.Frame):
         # excelWeightlbl_text = Label(self, text="Axle Weight", foreground=information_text_forground_color, background=information_text_background_color, font=(font_family, 14,'bold'), padding=(20,10))
         # excelWeightlbl_text.place(x=350, y=508)
 
-        self.excelWeightlbl = Label(self, text="1500", foreground=dynamic_data_forground_color, background=dynamic_data_background_color, font=(font_family, 14,'bold'), padding=(20,10))
-        self.excelWeightlbl.place(x=385, y=568)
+        # self.excelWeightlbl = Label(self, text="1500", foreground=dynamic_data_forground_color, background=dynamic_data_background_color, font=(font_family, 14,'bold'), padding=(20,10))
+        # self.excelWeightlbl.place(x=385, y=568)
         
         
 
@@ -576,6 +576,14 @@ class Page1(tk.Frame):
         # self.lbl2.place(x=130, y=200, anchor="center")
         self.lbl3 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
         self.lbl3.place(x=800, y=590, anchor="center")
+        
+        # Variable Data Measurment Labeling
+        self.bg_color_for_axleweight = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(66,10))
+        self.bg_color_for_axleweight.place(x=429, y=422)
+        # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
+        # self.lbl2.place(x=130, y=200, anchor="center")
+        self.excelWeightlbl = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 12, 'bold'), width=5)
+        self.excelWeightlbl.place(x=491, y=442, anchor="center")
         
 
         
