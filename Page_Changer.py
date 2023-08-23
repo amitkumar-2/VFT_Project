@@ -215,18 +215,19 @@ class MultiPageApp(tk.Tk):
         self.client.loop_start()
         
         
+    # functio To show selected page
     def show_page(self, page_name):
         # Show the selected page
         page = self.pages[page_name]
         page.tkraise()
         
     # Function for increasment of j For Time Graph
-    # j = 0.1
     def time_increasement(self):
         global j
         if j<300.1:
             j +=0.1
     
+    # Function to be executed on message published to topic
     def on_mqttMessage(self, client, userdata, msg):
         # Cleaning all data from rangeValues.txt file
         rangeValues_paths = ['rangeValuesForRPM.txt', 'rangeValuesForLBF.txt', 'rangeValuesForRBF.txt', 'rangeValuesForAW.txt']
@@ -315,7 +316,6 @@ class MultiPageApp(tk.Tk):
             
             ######################### GAUGE NEEDLE UPDATE on_message EVENT #####################################
             # Updating Gauge needle of Speed for page 2
-            # speed_list = [0]
             self.speed_list.insert(0, rpm)
             for i in range(len(self.speed_list)):
                 if len(self.speed_list) > 2:
@@ -336,7 +336,7 @@ class MultiPageApp(tk.Tk):
                     self.pages['Page2'].speedometer.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             
-            # Updating Gauge needle of Left Break Force
+            # Updating Gauge needle of Left Break Force on page 1
             # speed_list = [0]
             int_calibrated_lbf = int(calibrated_lbf*(6))
             self.lbf_list.insert(0, int_calibrated_lbf)
@@ -359,7 +359,7 @@ class MultiPageApp(tk.Tk):
                     self.pages['Page1'].speedometer.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             
-            # Updating Gauge needle of Right Break Force
+            # Updating Gauge needle of Right Break Force on page 1
             # speed_list = [0]
             int_calibrated_rbf = int(calibrated_rbf*(6))
             self.rbf_list.insert(0, int_calibrated_rbf)
@@ -385,7 +385,7 @@ class MultiPageApp(tk.Tk):
                     self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
                     time.sleep(0.0001)
             
-            # Updating Gauge needle of Axle Weight
+            # Updating Gauge needle of Axle Weight on page 1
             # speed_list = [0]
             int_calibrated_AW = int(calibrated_AW)
             self.axel_weight_list.insert(0, int_calibrated_AW)
@@ -418,6 +418,7 @@ class MultiPageApp(tk.Tk):
             self.pages['Page2'].label4.config(text=msg.payload.decode("utf-8"))
     
     
+    # Execute function on MQTT connection
     def on_mqttConnect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
         client.subscribe("001/TESTER/BREAK/BREAKFORCE")
