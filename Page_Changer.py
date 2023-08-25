@@ -427,9 +427,9 @@ class MultiPageApp(tk.Tk):
     
 
 
-
+# First oage of the VFT App
 class Page1(tk.Frame):
-    
+    # Initialising the page (Frame) on object instance created
     def __init__(self, parent, controller, mqtt_client):
         super().__init__(parent)
         self.config(background=self_background_color)
