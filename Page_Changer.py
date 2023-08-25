@@ -435,10 +435,6 @@ class Page1(tk.Frame):
         self.config(background=self_background_color)
         
         self.client = mqtt_client  # Store the MQTT client instance
-        # print(self.client)
-        
-        # label = tk.Label(self, text="Page 1", font=("Arial", 20))
-        # label.pack(pady=20)
         
         # Get the directory path where the script is located
         self.script_directory = os.path.dirname(os.path.abspath(__file__))
