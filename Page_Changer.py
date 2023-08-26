@@ -206,13 +206,13 @@ class MultiPageApp(tk.Tk):
         
         
         # MQTT All Process Code Is Here
-        self.mqttBroker = "3.110.187.253"
-        self.client = mqtt_client
-        # self.client = mqtt.Client("Smartphone")
-        self.client.on_message = self.on_mqttMessage
-        self.client.on_connect = self.on_mqttConnect
-        self.client.connect(self.mqttBroker,1883,60)
-        self.client.loop_start()
+        # self.mqttBroker = "3.110.187.253"
+        # self.client = mqtt_client
+        # # self.client = mqtt.Client("Smartphone")
+        # self.client.on_message = self.on_mqttMessage
+        # self.client.on_connect = self.on_mqttConnect
+        # self.client.connect(self.mqttBroker,1883,60)
+        # self.client.loop_start()
         
         
     # functio To show selected page
@@ -544,7 +544,7 @@ class Page1(tk.Frame):
                     ('calibri', 13, 'bold'))
 
         button = Button(self, text="Reset", width=10, style="Custom.TButton", command=self.run)
-        button.place(x=1175, y=670)
+        button.place(x=1100, y=670)
 
         button.bind("<Enter>", on_enter)
         button.bind("<Leave>", on_leave)
@@ -554,36 +554,36 @@ class Page1(tk.Frame):
         self.speedometer = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240, gauge_info_text="Left Break Force [kN]", gauge_info_text_x = 155, gauge_info_text_y = 230)
         self.speedometer1 = Speedometer(self, parent_width=310, parent_height=310, min_value=0, max_value=40, oval_radius_width=300, oval_radius_height=300, center_x=150, center_y=150, num_ticks_radius=110, ticks_radius=120, needle_quad_height=80, needle_quad_width=30, needle_quad_height_y3_y4 = 240, gauge_info_text="Right Break Force [kN]", gauge_info_text_x = 155, gauge_info_text_y = 230)
         self.axle_speedometer = Speedometer(self, parent_width=220, parent_height=200, min_value=0, max_value=160, oval_radius_width=200, oval_radius_height=200, center_x=100, center_y=100, num_ticks_radius=60, ticks_radius=70, needle_quad_height=40, needle_quad_width=20, needle_quad_height_y3_y4 = 140, gauge_info_text="Axle Weight", gauge_info_text_x = 100, gauge_info_text_y = 145)
-        self.speedometer.place(x=40, y=300)
-        self.speedometer1.place(x=650, y=300)
-        self.axle_speedometer.place(x=395, y=250)
+        self.speedometer.place(x=40, y=250)
+        self.speedometer1.place(x=650, y=250)
+        self.axle_speedometer.place(x=395, y=150)
         self.speedometer.update_speed(speed_list[0])
         self.speedometer1.update_speed(speed_list[0])
         self.axle_speedometer.update_speed(speed_list[0])
         
         # Variable Data Measurment Labeling
         self.bg_color_for_lbl2 = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(101,20))
-        self.bg_color_for_lbl2.place(x=85, y=560)
+        self.bg_color_for_lbl2.place(x=85, y=510)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
         self.lbl2 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
-        self.lbl2.place(x=187, y=590, anchor="center")
+        self.lbl2.place(x=187, y=540, anchor="center")
         
         # Variable Data Measurment Labeling
         self.bg_color_for_lbl3 = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(101,20))
-        self.bg_color_for_lbl3.place(x=698, y=560)
+        self.bg_color_for_lbl3.place(x=698, y=510)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
         self.lbl3 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
-        self.lbl3.place(x=800, y=590, anchor="center")
+        self.lbl3.place(x=800, y=540, anchor="center")
         
         # Variable Data Measurment Labeling
         self.bg_color_for_axleweight = Label(self, text="", foreground=self_background_color,borderwidth=2, relief="ridge", background='black', padding=(66,10))
-        self.bg_color_for_axleweight.place(x=429, y=422)
+        self.bg_color_for_axleweight.place(x=429, y=322)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
         self.excelWeightlbl = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 12, 'bold'), width=5)
-        self.excelWeightlbl.place(x=491, y=442, anchor="center")
+        self.excelWeightlbl.place(x=491, y=342, anchor="center")
         
 
         
@@ -593,7 +593,7 @@ class Page1(tk.Frame):
         
         button = tk.Button(self, text="Next", width=10,font =
                     ('calibri', 13, 'bold'),  command=lambda: controller.show_page("Page2"))
-        button.place(x=1375, y=670)
+        button.place(x=1300, y=670)
         
         
     # def update_speedometer(self, speed):
