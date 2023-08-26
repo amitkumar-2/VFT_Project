@@ -5,6 +5,7 @@ import math
 import json
 import time
 import os
+from random import *
 
 from tkinter.ttk import Label, Progressbar, Button
 
@@ -206,13 +207,13 @@ class MultiPageApp(tk.Tk):
         
         
         # MQTT All Process Code Is Here
-        # self.mqttBroker = "3.110.187.253"
-        # self.client = mqtt_client
-        # # self.client = mqtt.Client("Smartphone")
-        # self.client.on_message = self.on_mqttMessage
-        # self.client.on_connect = self.on_mqttConnect
-        # self.client.connect(self.mqttBroker,1883,60)
-        # self.client.loop_start()
+        self.mqttBroker = "3.110.187.253"
+        self.client = mqtt_client
+        # self.client = mqtt.Client("Smartphone")
+        self.client.on_message = self.on_mqttMessage
+        self.client.on_connect = self.on_mqttConnect
+        self.client.connect(self.mqttBroker,1883,60)
+        self.client.loop_start()
         
         
     # functio To show selected page
@@ -246,6 +247,8 @@ class MultiPageApp(tk.Tk):
             test_status = int(m_in['TestStatus'])
             axle_weight = int(m_in['Axle Weight'])
             rpm = int(m_in['rpm'])
+            random = randint(1, 10)
+            rpm = rpm*random
             
             # Calling back function to increase time    
             self.time_increasement()
@@ -328,12 +331,18 @@ class MultiPageApp(tk.Tk):
             if self.speed_list[0] > self.speed_list[1]:
                 for i in range(self.speed_list[0] - self.speed_list[1]):
                     actual_speed[0] += 1
-                    self.pages['Page2'].speedometer.update_speed(actual_speed[0])
+                    if actual_speed[0] < 250:
+                        self.pages['Page2'].speedometer.update_speed(actual_speed[0])
+                    else:
+                        pass
                     time.sleep(0.0001)
             else:
                 for i in range(self.speed_list[1] - self.speed_list[0]):
                     actual_speed[0] -= 1
-                    self.pages['Page2'].speedometer.update_speed(actual_speed[0])
+                    if actual_speed[0] < 250:
+                        self.pages['Page2'].speedometer.update_speed(actual_speed[0])
+                    else:
+                        pass
                     time.sleep(0.0001)
             
             # Updating Gauge needle of Left Break Force on page 1
@@ -513,7 +522,7 @@ class Page1(tk.Frame):
         break_efficiency_variable = 90
 
         break_efficient_value = Label(self, text= repr(break_efficiency_variable)  + "%", font=(font_family, 18, 'bold'), background=dynamic_data_background_color, foreground=dynamic_data_forground_color, padding=(30, 5))
-        break_efficient_value.place(x=300, y=655)
+        break_efficient_value.place(x=330, y=655)
 
         # Car testing progress status
         testing_status_text = Label(self, text="Testing Status:", font=(font_family, 14, 'bold'), background=information_text_background_color, foreground=information_text_forground_color, padding=(20,5))
@@ -526,8 +535,8 @@ class Page1(tk.Frame):
         test_result_text = Label(self, text="Test Result:", font=(font_family, 18, 'bold'), background=information_text_background_color, foreground=information_text_forground_color, padding=(20,5))
         test_result_text.place(x=450, y=655)
 
-        test_result = Label(self, text="NOT OK", font=(font_family, 16, 'bold'), background=dynamic_data_background_color, foreground=dynamic_data_forground_color, padding=(20,5))
-        test_result.place(x=640, y=657)
+        test_result = Label(self, text="NOT OK", font=(font_family, 16, 'bold'), background=dynamic_data_background_color, foreground=dynamic_data_forground_color, padding=(20,8))
+        test_result.place(x=660, y=655)
         
         
         # Styling reset buttom with the help of style configuration
@@ -566,7 +575,7 @@ class Page1(tk.Frame):
         self.bg_color_for_lbl2.place(x=85, y=510)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
-        self.lbl2 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
+        self.lbl2 = CenteredTextLabel(self, text="12.34", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
         self.lbl2.place(x=187, y=540, anchor="center")
         
         # Variable Data Measurment Labeling
@@ -574,7 +583,7 @@ class Page1(tk.Frame):
         self.bg_color_for_lbl3.place(x=698, y=510)
         # self.lbl2 = Label(self, text="0", foreground='#CC0CA1', background=dynamic_data_background_color, width=10, font=(font_family, 20,'bold'))
         # self.lbl2.place(x=130, y=200, anchor="center")
-        self.lbl3 = CenteredTextLabel(self, text="10000", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
+        self.lbl3 = CenteredTextLabel(self, text="10.23", foreground='white', background='black', font=('Arial', 20, 'bold'), width=10)
         self.lbl3.place(x=800, y=540, anchor="center")
         
         # Variable Data Measurment Labeling
