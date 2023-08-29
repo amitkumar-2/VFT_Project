@@ -450,15 +450,6 @@ class Page1(tk.Frame):
         os.chdir(self.script_directory)
         
         
-
-        self.image1 = Image.open("Green.png")
-        width, height = 285, 70
-        self.image1 = self.image1.resize((width, height), Image.ANTIALIAS)
-        self.image1_tk = ImageTk.PhotoImage(self.image1)
-        labelimg1 = Label(self, image=self.image1_tk, relief='flat', borderwidth=0, background=self_background_color)
-        # labelimg1.place(x=55, y=100)
-        
-        
         # Heading Labeling
         lbl1 = Label(self,text="Apply parking break to max and take a rest", foreground="white", background="black", font=(font_family, 25, 'bold'), width=100, padding=(250, 20))
         lbl1.pack()
