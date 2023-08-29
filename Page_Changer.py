@@ -434,8 +434,6 @@ class MultiPageApp(tk.Tk):
         
         
     
-
-
 # First oage of the VFT App
 class Page1(tk.Frame):
     # Initialising the page (Frame) on object instance created
@@ -451,13 +449,7 @@ class Page1(tk.Frame):
         # Change the working directory to the script's directory
         os.chdir(self.script_directory)
         
-        # Adding background images to make rounded corner of labels
-        self.image = Image.open("Green.png")
-        width, height = 285, 70
-        self.image = self.image.resize((width, height), Image.ANTIALIAS)
-        self.image_tk = ImageTk.PhotoImage(self.image)
-        labelimg = Label(self, image=self.image_tk, relief='flat', borderwidth=0, background=self_background_color)
-        # labelimg.place(x=650, y=100)
+        
 
         self.image1 = Image.open("Green.png")
         width, height = 285, 70
