@@ -1,0 +1,4 @@
+AB:CD:EF:12:34:56
+# rpm_range_1 range_min = 0 range_max = 1500 m = 1 c = 0
+
+# rpm_range_2 range_min = 1500 range_max = 1500000 dividend = 1 divisor = 10000 c = 0

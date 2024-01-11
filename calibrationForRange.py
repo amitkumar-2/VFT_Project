@@ -1,4 +1,5 @@
 import re
+import Find_Directory_Path
 
 def write_range_value(file_path, mac_address, value):
     def read_rpm_range_info(file_name, mac_address):
@@ -78,7 +79,8 @@ def write_range_value(file_path, mac_address, value):
                 
     # print(only_range_max_values, only_range_min_values)
     for n in range(len(only_range_min_values)):
-        file = open("rangeValuesForRPM.txt", "a")
+        filePath = Find_Directory_Path.resource_path("Range_Values_Files\\rangeValuesForRPM.txt")
+        file = open(filePath, "a")
         file.writelines(repr(only_range_min_values[n]) + ' ' +repr(only_range_max_values[n])+"\n")
         file.close()
     
@@ -93,12 +95,12 @@ def write_range_value(file_path, mac_address, value):
 
         range_values = []
 
-        with open("rangeValuesForRPM.txt", "r") as file:
+        with open(filePath, "r") as file:
             for line in file:
                 start, end = map(int, line.strip().split())
                 range_values.append(range(start, end))
 
-        print("RPM: ",range_values)
+        # print("RPM: ",range_values)
 
         
         range_txt = None

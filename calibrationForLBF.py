@@ -1,4 +1,5 @@
 import re
+import Find_Directory_Path
 
 def write_range_value(file_path, mac_address, value):
     def read_rpm_range_info(file_name, mac_address):
@@ -78,7 +79,8 @@ def write_range_value(file_path, mac_address, value):
                 
     # print(only_range_max_values, only_range_min_values)
     for n in range(len(only_range_min_values)):
-        file = open("rangeValuesForLBF.txt", "a")
+        filePath = Find_Directory_Path.resource_path("Range_Values_Files\\rangeValuesForLBF.txt")
+        file = open(filePath, "a")
         file.writelines(repr(only_range_min_values[n]) + ' ' +repr(only_range_max_values[n])+"\n")
         file.close()
     
@@ -92,13 +94,16 @@ def write_range_value(file_path, mac_address, value):
 
 
         range_values = []
-
-        with open("rangeValuesForLBF.txt", "r") as file:
+        
+        # filePath = Find_Directory_Path.resource_path("Range_Values_Files\\rangeValuesForLBF.txt")
+        
+        with open(filePath, "r") as file:
             for line in file:
+                print(line)
                 start, end = map(int, line.strip().split())
                 range_values.append(range(start, end))
 
-        print("LBF: ", range_values)
+        # print("LBF: ", range_values)
 
         
         range_txt = None
@@ -162,6 +167,8 @@ def write_range_value(file_path, mac_address, value):
             # print(rpm_range_info[0])
             for i in rpm_range_info[0]:
                 exec(i, globals())
+            # m = dividend/divisor
+            print('value of m is:', m)
         return m,c
         
     return return_calibration_values(value)
