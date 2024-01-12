@@ -121,7 +121,7 @@ class mqtt_object:
             self.break_force_left = int(m_in['LeftBrakeForce'])
             self.break_force_right = int(m_in['RightBrakeForce'])
             self.test_status = int(m_in['TestStart'])
-            self.axle_weight = int(m_in['Weight'])
+            self.axle_weight = abs(int(m_in['Weight']))
             self.rpm = int(m_in['RPM'])
             random = randint(1, 10)
             self.rpm = self.rpm*random
@@ -207,7 +207,7 @@ class mqtt_object:
             file_path = file_path = Find_Directory_Path.resource_path("Calibration_Files\\calibrationConfigurationAWFile.txt")
             mac_address = "AB:CD:EF:12:34:56"
             offset = 320
-            coef = 90
+            coef = 40
             raw_data = self.axle_weight
             value = round((raw_data - offset)/coef, 2)
             if value > 0:
@@ -276,19 +276,23 @@ class mqtt_object:
             # print("lbfList = ", self.lbf_list)
             
             actual_speed = [self.lbf_list[1]]
-            if self.lbf_list[0] > self.lbf_list[1] and self.lbf_list[0] < 250:
+            if self.lbf_list[0] > self.lbf_list[1] and 0 <= self.lbf_list[0] < 250:
                 for i in range(self.lbf_list[0] - self.lbf_list[1]):
                     actual_speed[0] += 1
                     if actual_speed[0] < 250:
                         # self.pages['Page1'].speedometer.update_speed(actual_speed[0])
                         self.speedometer_left.update_speed(actual_speed[0])
+                    else:
+                        break
                     time.sleep(0.0001)
-            elif self.lbf_list[1] >= 0:
+            elif self.lbf_list[1] >= 0 and self.lbf_list[0] >= 0:
                 for i in range(self.lbf_list[1] - self.lbf_list[0]):
                     actual_speed[0] -= 1
                     if actual_speed[0] > 0:
                         # self.pages['Page1'].speedometer.update_speed(actual_speed[0])
                         self.speedometer_left.update_speed(actual_speed[0])
+                    else:
+                        break
                     time.sleep(0.0001)
             
             # Updating Gauge needle of Right Break Force on page 1
@@ -305,14 +309,14 @@ class mqtt_object:
             # print("rbfList = ", self.rbf_list)
             
             actual_speed = [self.rbf_list[1]]
-            if self.rbf_list[0] > self.rbf_list[1] and self.rbf_list[0] < 250:
+            if self.rbf_list[0] > self.rbf_list[1] and 0 <= self.rbf_list[0] < 250:
                 for i in range(self.rbf_list[0] - self.rbf_list[1]):
                     actual_speed[0] += 1
                     if actual_speed[0] < 250:
                         # self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
                         self.speedometer_right.update_speed(actual_speed[0])
                     else:
-                        pass
+                        break
                     time.sleep(0.0001)
             elif self.rbf_list[1] >= 0:
                 for i in range(self.rbf_list[1] - self.rbf_list[0]):
@@ -320,6 +324,8 @@ class mqtt_object:
                     if actual_speed[0] > 0:
                         # self.pages['Page1'].speedometer1.update_speed(actual_speed[0])
                         self.speedometer_right.update_speed(actual_speed[0])
+                    else:
+                        break
                     time.sleep(0.0001)
             
             # Updating Gauge needle of Axle Weight on page 1
@@ -340,6 +346,8 @@ class mqtt_object:
                     if actual_speed[0] < 250:
                         # self.pages['Page1'].axle_speedometer.update_speed(actual_speed[0])
                         self.speedometer_axle.update_speed(actual_speed[0])
+                    else:
+                        break
                     time.sleep(0.0001)
             elif self.axel_weight_list[1] >= 0:
                 for i in range(self.axel_weight_list[1] - self.axel_weight_list[0]):
@@ -347,6 +355,8 @@ class mqtt_object:
                     if actual_speed[0] > 0:
                         # self.pages['Page1'].axle_speedometer.update_speed(actual_speed[0])
                         self.speedometer_axle.update_speed(actual_speed[0])
+                    else:
+                        break
                     time.sleep(0.0001)
             
             print('################################ending here########################################')
